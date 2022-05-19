@@ -16,7 +16,7 @@ This workflow is meant to be executed on a computing cluster running with **SLUR
 
 Clone the repository:
 ```sh
-git clone ...
+git clone https://github.com/AnneSoBen/obitools_workflow.git
 ```
 ### Directories and files structure
 
