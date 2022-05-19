@@ -43,7 +43,8 @@ Before running the workflow, the two configuration files have to be modified: `w
 
 Then, to run the workflow in a single command on the cluster:
 
-```
+```sh
+cd workflow
 sbatch sub_smk.sh
 ```
 
