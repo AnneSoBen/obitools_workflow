@@ -106,6 +106,10 @@ cd workflow/
 sbatch sub_smk.sh
 ```
 
+## Going further
+
+You may want to clean up potential molecular artifacts: have a look at the R package [metabaR](https://github.com/metabaRfactory/metabaR).
+
 ## Acknowledgements
 
 Thanks to **Lucie Zinger**, **Frédéric Boyer**, **Céline Mercier** and **Clément Lionnet** for their help with the obitools!
