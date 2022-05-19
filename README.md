@@ -33,10 +33,7 @@ Download/copy your data in the `resources/` folder. Three files are required:
 - forward and reverse fastq files
 - the corresponding ngsfilter file
 
-They should be named as follows:
-basename_R1.fastq
-basename_R2.fastq
-basename_ngsfilter.tab
+They should be named as follows: `basename_R1.fastq`, `basename_R2.fastq`, `basename_ngsfilter.tab`
 
 And be put in a subfolder whose name is the "basename" of the files (see _Example_).
 
@@ -54,7 +51,7 @@ sbatch sub_smk.sh
 
 ### Download toy data
 
-If you want to test the workflow, download toy data from the obitools tutorial (https://pythonhosted.org/OBITools/wolves.html) in the resources folder:
+If you want to test the workflow, download toy data from the obitools tutorial (https://pythonhosted.org/OBITools/wolves.html) in the `resources/` folder:
 ```sh
 wget -O resources/wolf_tutorial.zip https://pythonhosted.org/OBITools/_downloads/wolf_tutorial.zip
 unzip resources/wolf_tutorial.zip -d resources/
