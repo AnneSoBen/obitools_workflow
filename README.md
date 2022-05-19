@@ -38,6 +38,8 @@ basename_R1.fastq
 basename_R2.fastq
 basename_ngsfilter.tab
 
+And be put in a subfolder whose name is the "basename" of the files (see _Example_).
+
 ## Usage
 
 Before running the workflow, the two configuration files have to be modified: `workflow/cluster.yaml` that sets up the ressources available for each rule, and `config/config.yaml` where you can edit the values of the parameters used by the rules and the basename of your files.
@@ -64,6 +66,36 @@ Rename the files to fit the template decribed above (or create symbolic links):
 ln -s wolf_F.fastq resources/wolf_diet/wolf_diet_R1.fastq
 ln -s wolf_R.fastq resources/wolf_diet/wolf_diet_R2.fastq
 ln -s wolf_diet_ngsfilter.txt resources/wolf_diet/wolf_diet_ngsfilter.tab
+```
+You should get this directories and files structure:
+```sh
+tree
+```
+
+```
+.
+├── config
+│   └── config.yaml
+├── LICENSE
+├── log
+├── README.md
+├── resources
+│   └── wolf_diet
+│       ├── db_v05_r117.fasta
+│       ├── embl_r117.ndx
+│       ├── embl_r117.rdx
+│       ├── embl_r117.tdx
+│       ├── wolf_diet_ngsfilter.tab -> wolf_diet_ngsfilter.txt
+│       ├── wolf_diet_ngsfilter.txt
+│       ├── wolf_diet_R1.fastq -> wolf_F.fastq
+│       ├── wolf_diet_R2.fastq -> wolf_R.fastq
+│       ├── wolf_F.fastq
+│       └── wolf_R.fastq
+├── results
+└── workflow
+    ├── cluster.yaml
+    ├── Snakefile
+    └── sub_smk.sh
 ```
 
 The config.yaml file is already modified to fit this data.
