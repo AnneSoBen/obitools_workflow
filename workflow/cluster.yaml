@@ -3,7 +3,7 @@ __default__:
   cpus: 1
 
 split_fastq:
-  mem: 100M
+  mem: 20M
 
 pairing:
   mem: 100M

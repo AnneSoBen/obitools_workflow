@@ -10,4 +10,3 @@ module load bioinfo/snakemake-5.25.0
 
 snakemake --cores 1 --unlock
 snakemake --jobs  10 --cluster-config cluster.yaml --cluster "sbatch --mem {cluster.mem} -c {cluster.cpus}"
-#snakemake --report report.html

@@ -1,0 +1,207 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 10
+Job counts:
+	count	jobs
+	1	alifilt
+	1	all
+	1	basicfilt
+	1	clustering
+	1	demultiplex
+	1	merge_clust
+	1	merge_derepl
+	1	merge_paired
+	1	split_fasta
+	1	split_fastq
+	1	tab_format
+	11
+
+[Thu May 19 14:44:44 2022]
+checkpoint split_fastq:
+    input: ../resources/wolf_diet/wolf_diet_R1.fastq, ../resources/wolf_diet/wolf_diet_R2.fastq
+    output: ../results/wolf_diet/splitted_fastq
+    jobid: 10
+    wildcards: run=wolf_diet
+Downstream jobs will be updated after completion.
+
+Submitted job 10 with external jobid 'Submitted batch job 34604611'.
+Updating job 9 (merge_paired).
+[Thu May 19 14:45:24 2022]
+Finished job 10.
+1 of 13 steps (8%) done
+
+[Thu May 19 14:45:24 2022]
+rule pairing:
+    input: ../results/wolf_diet/splitted_fastq/wolf_diet_R1_2.fastq, ../results/wolf_diet/splitted_fastq/wolf_diet_R2_2.fastq
+    output: ../results/wolf_diet/splitted_fastq/wolf_diet_R1R2_2.fastq
+    jobid: 12
+    wildcards: run=wolf_diet, n=2
+
+Submitted job 12 with external jobid 'Submitted batch job 34604617'.
+
+[Thu May 19 14:45:24 2022]
+rule pairing:
+    input: ../results/wolf_diet/splitted_fastq/wolf_diet_R1_1.fastq, ../results/wolf_diet/splitted_fastq/wolf_diet_R2_1.fastq
+    output: ../results/wolf_diet/splitted_fastq/wolf_diet_R1R2_1.fastq
+    jobid: 13
+    wildcards: run=wolf_diet, n=1
+
+Submitted job 13 with external jobid 'Submitted batch job 34604618'.
+[Thu May 19 14:47:34 2022]
+Finished job 12.
+2 of 13 steps (15%) done
+[Thu May 19 14:47:34 2022]
+Finished job 13.
+3 of 13 steps (23%) done
+
+[Thu May 19 14:47:34 2022]
+rule merge_paired:
+    input: ../results/wolf_diet/splitted_fastq/wolf_diet_R1R2_2.fastq, ../results/wolf_diet/splitted_fastq/wolf_diet_R1R2_1.fastq
+    output: ../results/wolf_diet/wolf_diet_R1R2.fastq
+    jobid: 11
+    wildcards: run=wolf_diet
+
+Submitted job 11 with external jobid 'Submitted batch job 34604653'.
+[Thu May 19 14:47:54 2022]
+Finished job 11.
+4 of 13 steps (31%) done
+
+[Thu May 19 14:47:54 2022]
+rule alifilt:
+    input: ../results/wolf_diet/wolf_diet_R1R2.fastq
+    output: ../results/wolf_diet/wolf_diet_R1R2_good.fastq, ../results/wolf_diet/wolf_diet_R1R2_bad.fastq
+    log: ../log/split_ali_wolf_diet.log
+    jobid: 8
+    wildcards: run=wolf_diet
+
+Submitted job 8 with external jobid 'Submitted batch job 34604657'.
+[Thu May 19 14:48:44 2022]
+Finished job 8.
+5 of 13 steps (38%) done
+
+[Thu May 19 14:48:44 2022]
+rule demultiplex:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good.fastq
+    output: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed.fasta, ../results/wolf_diet/wolf_diet_R1R2_good_unassigned.fasta
+    log: ../log/demultiplex_wolf_diet.log
+    jobid: 7
+    wildcards: run=wolf_diet
+
+Submitted job 7 with external jobid 'Submitted batch job 34604665'.
+[Thu May 19 14:50:34 2022]
+Finished job 7.
+6 of 13 steps (46%) done
+
+[Thu May 19 14:50:34 2022]
+checkpoint split_fasta:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed.fasta
+    output: ../results/wolf_diet/derepl_tmp
+    jobid: 6
+    wildcards: run=wolf_diet
+Downstream jobs will be updated after completion.
+
+Submitted job 6 with external jobid 'Submitted batch job 34604678'.
+Updating job 5 (merge_derepl).
+[Thu May 19 14:51:34 2022]
+Finished job 6.
+7 of 15 steps (47%) done
+
+[Thu May 19 14:51:34 2022]
+rule derepl:
+    input: ../results/wolf_diet/derepl_tmp/tmp0.fasta
+    output: ../results/wolf_diet/uniq/tmp_uniq0.fasta
+    jobid: 15
+    wildcards: run=wolf_diet, t=0
+
+Submitted job 15 with external jobid 'Submitted batch job 34604682'.
+
+[Thu May 19 14:51:34 2022]
+rule derepl:
+    input: ../results/wolf_diet/derepl_tmp/tmp1.fasta
+    output: ../results/wolf_diet/uniq/tmp_uniq1.fasta
+    jobid: 16
+    wildcards: run=wolf_diet, t=1
+
+Submitted job 16 with external jobid 'Submitted batch job 34604683'.
+[Thu May 19 14:52:14 2022]
+Finished job 15.
+8 of 15 steps (53%) done
+[Thu May 19 14:52:14 2022]
+Finished job 16.
+9 of 15 steps (60%) done
+
+[Thu May 19 14:52:14 2022]
+rule merge_derepl:
+    input: ../results/wolf_diet/uniq/tmp_uniq0.fasta, ../results/wolf_diet/uniq/tmp_uniq1.fasta
+    output: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl.fasta
+    log: ../log/merge_derepl_wolf_diet.log
+    jobid: 14
+    wildcards: run=wolf_diet
+
+Submitted job 14 with external jobid 'Submitted batch job 34604687'.
+[Thu May 19 14:52:24 2022]
+Finished job 14.
+10 of 15 steps (67%) done
+
+[Thu May 19 14:52:24 2022]
+rule basicfilt:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl.fasta
+    output: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt.fasta
+    log: ../log/basicfilt_wolf_diet.log
+    jobid: 4
+    wildcards: run=wolf_diet
+
+Submitted job 4 with external jobid 'Submitted batch job 34604688'.
+[Thu May 19 14:52:54 2022]
+Finished job 4.
+11 of 15 steps (73%) done
+
+[Thu May 19 14:52:54 2022]
+rule clustering:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt.fasta
+    output: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta
+    log: ../log/clustering_wolf_diet.log
+    jobid: 3
+    wildcards: run=wolf_diet
+    threads: 8
+
+Submitted job 3 with external jobid 'Submitted batch job 34604689'.
+[Thu May 19 14:53:34 2022]
+Finished job 3.
+12 of 15 steps (80%) done
+
+[Thu May 19 14:53:34 2022]
+rule merge_clust:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta
+    output: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta
+    log: ../log/merge_clust_wolf_diet.log
+    jobid: 2
+    wildcards: run=wolf_diet
+
+Submitted job 2 with external jobid 'Submitted batch job 34604691'.
+[Thu May 19 14:53:54 2022]
+Finished job 2.
+13 of 15 steps (87%) done
+
+[Thu May 19 14:53:55 2022]
+rule tab_format:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta
+    output: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab
+    log: ../log/tab_format_wolf_diet.log
+    jobid: 1
+    wildcards: run=wolf_diet
+
+Submitted job 1 with external jobid 'Submitted batch job 34604692'.
+[Thu May 19 14:54:25 2022]
+Finished job 1.
+14 of 15 steps (93%) done
+
+[Thu May 19 14:54:25 2022]
+localrule all:
+    input: ../results/wolf_diet/wolf_diet_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab
+    jobid: 0
+
+[Thu May 19 14:54:25 2022]
+Finished job 0.
+15 of 15 steps (100%) done
+Complete log: /work/abenoiston/obitools_workflow/workflow/.snakemake/log/2022-05-19T144443.829228.snakemake.log
