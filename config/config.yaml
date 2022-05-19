@@ -1,0 +1,17 @@
+resourcesfolder:
+  ../resources/
+resultsfolder:
+  ../results/
+fastqfiles:
+  - wolf_diet
+split_fastq:
+  nfiles: 2
+alifilt:
+  minscore: 40.00
+split_fasta:
+  nfiles: 2
+basicfilt:
+  minlength: 80
+  mincount: 1
+clustering:
+  minsim: 0.97

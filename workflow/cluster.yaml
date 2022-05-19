@@ -1,0 +1,25 @@
+__default__:
+  mem: 1G
+  cpus: 1
+
+split_fastq:
+  mem: 100M
+
+pairing:
+  mem: 100M
+
+derepl:
+  mem: 8G
+
+split_fasta:
+  mem: 100M
+
+clustering:
+  cpus: 8
+  mem: 8G
+
+merge_clust:
+  mem: 4G
+
+tab_format:
+  mem: 2G

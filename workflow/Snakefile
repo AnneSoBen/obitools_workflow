@@ -1,0 +1,232 @@
+__author__ = "Anne-Sophie Benoiston"
+__email__ = "anne-sophie.benoiston@ird.fr"
+
+"""
+DESCRIPTION
+
+This is a snakemake workflow that analyzes DNA metabarcoding data with the OBITools1.
+
+"""
+
+configfile: "../config/config.yaml"
+
+
+rule all:
+	input:
+		expand("{folder}{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab", run=config["fastqfiles"], folder=config["resultsfolder"])
+
+# SPLIT FASTQ
+checkpoint split_fastq:
+	input:
+		R1=config["resourcesfolder"]+"{run}/{run}_R1.fastq",
+		R2=config["resourcesfolder"]+"{run}/{run}_R2.fastq"
+	output:
+		directory(config["resultsfolder"]+"{run}/splitted_fastq")
+	params:
+		folder=config["resultsfolder"]+"{run}/splitted_fastq",
+		nfiles=config["split_fastq"]["nfiles"],
+		R1=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1",
+		R2=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R2"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		mkdir {params.folder}
+		obidistribute -n {params.nfiles} -p {params.R1} {input.R1}
+		obidistribute -n {params.nfiles} -p {params.R2} {input.R2}
+		"""
+
+
+# PAIRING
+rule pairing:
+	input:
+		R1=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1_{n}.fastq",
+		R2=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R2_{n}.fastq"
+	output:
+		config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1R2_{n}.fastq"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		illuminapairedend -r {input.R2} {input.R1} > {output}
+		"""
+
+
+# AGGREGATE
+def aggregate_R1R2(wildcards):
+	checkpoint_output=checkpoints.split_fastq.get(**wildcards).output[0]
+	file_names=expand(config["resultsfolder"]+"{{run}}/splitted_fastq/{{run}}_R1R2_{n}.fastq", n=glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
+	print('in_def_aggregate_R1R2')
+	print(checkpoint_output)
+	print(glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
+  	print(file_names)
+	return file_names
+	
+
+# MERGE PAIRED FILES
+rule merge_paired:
+	input:
+		aggregate_R1R2
+	output:	
+		config["resultsfolder"]+"{run}/{run}_R1R2.fastq"
+	shell:
+		"""
+		cat {input} > {output}
+ 		"""
+
+
+# SPLIT GOOD/BAD ALIGNMENTS
+rule alifilt:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2.fastq"
+	output:
+		good=config["resultsfolder"]+"{run}/{run}_R1R2_good.fastq",
+		bad=config["resultsfolder"]+"{run}/{run}_R1R2_bad.fastq"
+	log:
+		"../log/split_ali_{run}.log"
+	params:
+		minscore=config["alifilt"]["minscore"],
+		prefix=config["resultsfolder"]+"{run}/{run}_R1R2_"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		obiannotate -S ali:'"good" if score>{params.minscore} else "bad"' {input} | obisplit -t ali -p {params.prefix} 2> {log}
+		"""
+
+
+# DEMULTIPLEXING
+rule demultiplex:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good.fastq"
+	output:
+		demultiplexed=config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed.fasta",
+		unassigned=config["resultsfolder"]+"{run}/{run}_R1R2_good_unassigned.fasta"
+	params:
+		ngs=config["resourcesfolder"]+"{run}/{run}_ngsfilter.tab"
+	log:
+		"../log/demultiplex_{run}.log"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		obiannotate --without-progress-bar --sanger -S 'Avgqphred:-int(math.log10(sum(sequence.quality)/len(sequence))*10)' {input} | ngsfilter --fasta-output -t {params.ngs} -u {output.unassigned} > {output.demultiplexed} 2> {log}
+		"""
+
+
+# SPLIT FASTA FILES TO SPEED UP DEREPLICATION
+checkpoint split_fasta:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed.fasta"
+	output:
+		directory(config["resultsfolder"]+"{run}/derepl_tmp")
+	params:
+		folder=config["resultsfolder"]+"{run}/derepl_tmp",
+		nfiles=config["split_fasta"]["nfiles"],
+		tmp=config["resultsfolder"]+"{run}/derepl_tmp/tmp"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		mkdir {params.folder}
+		obiannotate -S start:"hash(str(sequence))%{params.nfiles}" {input} | obisplit -t start -p {params.tmp}
+		"""
+
+
+# DEREPLICATION
+rule derepl:
+	input:
+		config["resultsfolder"]+"{run}/derepl_tmp/tmp{t}.fasta"
+	output:
+		config["resultsfolder"]+"{run}/uniq/tmp_uniq{t}.fasta"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		obiuniq -m sample {input} > {output}
+		"""
+
+
+# AGGREGATE
+def aggregate_derepl(wildcards):
+        checkpoint_output=checkpoints.split_fasta.get(**wildcards).output[0]
+        file_names=expand(config["resultsfolder"]+"{{run}}/uniq/tmp_uniq{t}.fasta", t=glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
+        print('in_def_aggregate_derepl')
+	print(checkpoint_output)
+	print(glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
+        print(file_names)
+        return file_names
+
+
+# MERGE DEREPLICATED FILES
+rule merge_derepl:
+	input:
+		aggregate_derepl
+	output:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl.fasta"
+	log:
+		"../log/merge_derepl_{run}.log"
+	shell:
+		"""
+		cat {input} > {output} 2> {log}
+		"""
+
+
+# BASIC FILTRATION
+rule basicfilt:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl.fasta"
+	output:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
+	log:
+		"../log/basicfilt_{run}.log"
+	params:
+		minlength=config["basicfilt"]["minlength"],
+		mincount=config["basicfilt"]["mincount"]
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		obiannotate --length -S 'GC_content:len(str(sequence).replace("a","").replace("t",""))*100/len(sequence)' {input} | obigrep -l {params.minlength} -s '^[acgt]+$' -p 'count>{params.mincount}' > {output} 2> {log}
+		"""
+
+
+# CLUSTERING
+rule clustering:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
+	output:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
+	log:
+		"../log/clustering_{run}.log"
+	params:
+		minsim=config["clustering"]["minsim"]
+	threads: 8
+	shell:
+		"""
+		set +u; module load bioinfo/sumaclust_v1.0.31; set -u
+		sumaclust -t {params.minsim} -p {threads} {input} > {output}
+		"""
+
+
+# MERGE CLUSTERS
+rule merge_clust:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
+	output:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
+	log:
+		"../log/merge_clust_{run}.log"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		obiselect -c cluster -n 1 --merge sample -M -f count {input} > {output} 2> {log}
+		"""
+
+
+# TAB FORMATTING
+rule tab_format:
+	input:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
+	output:
+		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
+	log:
+		"../log/tab_format_{run}.log"
+	shell:
+		"""
+		set +u; module load bioinfo/obitools-v1.2.11; set -u
+		obitab -n NA -d -o {input} > {output} 2> {log}
+		"""
