@@ -112,7 +112,7 @@ You may want to clean up potential molecular artifacts: have a look at the R pac
 
 ## Acknowledgements
 
-Thanks to **Lucie Zinger**, **Frédéric Boyer**, **Céline Mercier** and **Clément Lionnet** for their help with the obitools!
+Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric Boyer](https://www.researchgate.net/profile/Frederic-Boyer-3)**, **[Céline Mercier](https://www.celine-mercier.info/)** and **Clément Lionnet** for their help with the obitools!
 
 ## How to cite this repository
 
