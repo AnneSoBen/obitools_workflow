@@ -118,7 +118,7 @@ Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric 
 
 Benoiston Anne-Sophie, Obitools workflow (2022), GitHub repository, https://github.com/AnneSoBen/obitools_workflow
 
-Thank you for citing this repository is you use it for your research :)
+Thank you for citing this repository is you use if for your research :)
 
 ## References
 
