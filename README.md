@@ -114,6 +114,12 @@ You may want to clean up potential molecular artifacts: have a look at the R pac
 
 Thanks to **Lucie Zinger**, **Frédéric Boyer**, **Céline Mercier** and **Clément Lionnet** for their help with the obitools!
 
+## How to cite this repository
+
+Benoiston Anne-Sophie, Obitools workflow (2022), GitHub repository, https://github.com/AnneSoBen/obitools_workflow
+
+Thank you for citing this repository is you use it for your research :)
+
 ## References
 
 Boyer, F., Mercier, C., Bonin, A., Bras, Y. L., Taberlet, P., & Coissac, E. (2016). obitools : A unix-inspired software package for DNA metabarcoding. Molecular Ecology Resources, 16(1), 176‑182.
