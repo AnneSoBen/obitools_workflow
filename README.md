@@ -118,7 +118,7 @@ Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric 
 
 ## How to cite this repository
 
-Benoiston Anne-Sophie, Obitools workflow (2022), GitHub repository, https://github.com/AnneSoBen/obitools_workflow
+Benoiston Anne-Sophie, Obitools workflow (2022), GitHub repository, https://github.com/AnneSoBen/obitools_workflow, doi: 10.5281/zenodo.6676578
 
 Thank you for citing this repository is you use if for your research :)
 
