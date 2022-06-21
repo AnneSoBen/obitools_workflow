@@ -1,0 +1,9 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Benoiston
+    given-names: Anne-Sophie
+    orcid:  https://orcid.org/0000-0001-9446-5703 
+title: AnneSoBen/obitools_workflow: First release
+version: v1.0.0
+date-released: 2022-06-21
