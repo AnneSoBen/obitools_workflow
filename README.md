@@ -1,5 +1,7 @@
 # obitools_workflow
 
+[![DOI](https://zenodo.org/badge/494010774.svg)](https://zenodo.org/badge/latestdoi/494010774)
+
 ## About
 
 This is a snakemake workflow based on the obitools suite of programs, that analyzes DNA metabarcoding data.
