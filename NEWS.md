@@ -1,3 +1,16 @@
-# obitools_workflow 1.0.0
+# obitools_workflow
 
-This is the first release of the obitools_workflow.
+# 1.0.1 - 2022-07-25
+
+## Added
+
+* Option to merge serveral libraries before dereplication
+
+## Updated
+
+* README.md
+
+# 1.0.0 - 2022-06-17
+
+* First release of the obitools workflow
+
