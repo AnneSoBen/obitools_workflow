@@ -14,3 +14,5 @@
 
 * First release of the obitools workflow
 
+Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: First release (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.6676578
+
