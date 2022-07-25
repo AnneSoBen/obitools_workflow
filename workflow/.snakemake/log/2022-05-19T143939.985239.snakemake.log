@@ -1,5 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 19 of /work/abenoiston/obitools_workflow/workflow/Snakefile:
-Missing input files for rule split_fastq:
-../resources/wolf_diet/wolf_diet_R1.fastq
-../resources/wolf_diet/wolf_diet_R2.fastq

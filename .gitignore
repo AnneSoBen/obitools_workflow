@@ -1,0 +1,8 @@
+# files and folder to ignore:
+workflow/.snakemake
+workflow/.snakemake/*
+workflow/*.err
+workflow/*.out
+log/*.log
+resources/*
+results/*

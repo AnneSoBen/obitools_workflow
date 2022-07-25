@@ -4,16 +4,31 @@ __email__ = "anne-sophie.benoiston@ird.fr"
 """
 DESCRIPTION
 
-This is a snakemake workflow that analyzes DNA metabarcoding data with the OBITools1.
+This is a snakemake workflow that analyzes DNA metabarcoding data with the OBITools v1.2.11 and SUMACLUST.
 
 """
 
 configfile: "../config/config.yaml"
 
 
+
+# GET FINAL OUTPUT(S)
+def get_input_all():
+	print(config["tomerge"])
+	if config["tomerge"]:
+		inputfiles=config["resultsfolder"]+config["mergedfile"]+"/"+config["mergedfile"]+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
+	else:
+		inputfiles=expand("{folder}{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab", run=config["fastqfiles"], folder=config["resultsfolder"])
+	print("Expected output(s):")
+	print(inputfiles)
+	return inputfiles
+
+
+
 rule all:
 	input:
-		expand("{folder}{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab", run=config["fastqfiles"], folder=config["resultsfolder"])
+		get_input_all()
+
 
 # SPLIT FASTQ
 checkpoint split_fastq:
@@ -42,7 +57,7 @@ rule pairing:
 		R1=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1_{n}.fastq",
 		R2=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R2_{n}.fastq"
 	output:
-		config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1R2_{n}.fastq"
+		temp(config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1R2_{n}.fastq")
 	shell:
 		"""
 		set +u; module load bioinfo/obitools-v1.2.11; set -u
@@ -53,7 +68,7 @@ rule pairing:
 # AGGREGATE
 def aggregate_R1R2(wildcards):
 	checkpoint_output=checkpoints.split_fastq.get(**wildcards).output[0]
-	file_names=expand(config["resultsfolder"]+"{{run}}/splitted_fastq/{{run}}_R1R2_{n}.fastq", n=glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
+	file_names=temp(expand(config["resultsfolder"]+"{{run}}/splitted_fastq/{{run}}_R1R2_{n}.fastq", n=glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n))
 	print('in_def_aggregate_R1R2')
 	print(checkpoint_output)
 	print(glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
@@ -67,10 +82,13 @@ rule merge_paired:
 		aggregate_R1R2
 	output:	
 		config["resultsfolder"]+"{run}/{run}_R1R2.fastq"
+	params:
+		splittedfastq=config["resultsfolder"]+"{run}/splitted_fastq"
 	shell:
 		"""
 		cat {input} > {output}
- 		"""
+		rm -r {params.splittedfastq}
+		"""
 
 
 # SPLIT GOOD/BAD ALIGNMENTS
@@ -110,16 +128,41 @@ rule demultiplex:
 		"""
 
 
+if config["tomerge"]:
+	# MERGE LIBRARIES
+	rule merge_demultiplex:
+		input:
+			expand(config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed.fasta", run=config["fastqfiles"])
+		output:
+			config["resultsfolder"]+config["mergedfile"]+"/"+config["mergedfile"]+"_R1R2_good_demultiplexed.fasta"
+		log:
+			"../log/merge_demultiplex_"+config["mergedfile"]+".log"
+		shell:
+			"""
+			cat {input} > {output} 2> {log}
+			"""
+
+
+if config["tomerge"]:
+	folder_prefix=config["resultsfolder"]+config["mergedfile"]+"/"
+	folder_prefix2=folder_prefix
+	files_prefix=config["mergedfile"]
+else:
+	folder_prefix=config["resultsfolder"]+"{run}/"
+	folder_prefix2=config["resultsfolder"]+"{{run}}/"
+	files_prefix="{run}"
+
+
 # SPLIT FASTA FILES TO SPEED UP DEREPLICATION
 checkpoint split_fasta:
 	input:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed.fasta"
 	output:
-		directory(config["resultsfolder"]+"{run}/derepl_tmp")
+		directory(folder_prefix+"derepl_tmp")
 	params:
-		folder=config["resultsfolder"]+"{run}/derepl_tmp",
+		folder=folder_prefix+"derepl_tmp",
 		nfiles=config["split_fasta"]["nfiles"],
-		tmp=config["resultsfolder"]+"{run}/derepl_tmp/tmp"
+		tmp=folder_prefix+"derepl_tmp/tmp"
 	shell:
 		"""
 		set +u; module load bioinfo/obitools-v1.2.11; set -u
@@ -131,9 +174,9 @@ checkpoint split_fasta:
 # DEREPLICATION
 rule derepl:
 	input:
-		config["resultsfolder"]+"{run}/derepl_tmp/tmp{t}.fasta"
+		folder_prefix+"derepl_tmp/tmp{t}.fasta"
 	output:
-		config["resultsfolder"]+"{run}/uniq/tmp_uniq{t}.fasta"
+		folder_prefix+"uniq/tmp_uniq{t}.fasta"
 	shell:
 		"""
 		set +u; module load bioinfo/obitools-v1.2.11; set -u
@@ -144,7 +187,7 @@ rule derepl:
 # AGGREGATE
 def aggregate_derepl(wildcards):
         checkpoint_output=checkpoints.split_fasta.get(**wildcards).output[0]
-        file_names=expand(config["resultsfolder"]+"{{run}}/uniq/tmp_uniq{t}.fasta", t=glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
+        file_names=expand(folder_prefix2+"uniq/tmp_uniq{t}.fasta", t=glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
         print('in_def_aggregate_derepl')
 	print(checkpoint_output)
 	print(glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
@@ -157,23 +200,27 @@ rule merge_derepl:
 	input:
 		aggregate_derepl
 	output:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl.fasta"
+	params:
+              	derepl=folder_prefix+"derepl_tmp",
+		uniq=folder_prefix+"uniq"
 	log:
-		"../log/merge_derepl_{run}.log"
+		"../log/merge_derepl_"+files_prefix+".log"
 	shell:
 		"""
 		cat {input} > {output} 2> {log}
+		rm -r {params.derepl} {params.uniq}
 		"""
 
 
 # BASIC FILTRATION
 rule basicfilt:
 	input:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl.fasta"
 	output:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
 	log:
-		"../log/basicfilt_{run}.log"
+		"../log/basicfilt_"+files_prefix+".log"
 	params:
 		minlength=config["basicfilt"]["minlength"],
 		mincount=config["basicfilt"]["mincount"]
@@ -187,11 +234,11 @@ rule basicfilt:
 # CLUSTERING
 rule clustering:
 	input:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
 	output:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
 	log:
-		"../log/clustering_{run}.log"
+		"../log/clustering_"+files_prefix+".log"
 	params:
 		minsim=config["clustering"]["minsim"]
 	threads: 8
@@ -205,11 +252,11 @@ rule clustering:
 # MERGE CLUSTERS
 rule merge_clust:
 	input:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
 	output:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
 	log:
-		"../log/merge_clust_{run}.log"
+		"../log/merge_clust_"+files_prefix+".log"
 	shell:
 		"""
 		set +u; module load bioinfo/obitools-v1.2.11; set -u
@@ -220,11 +267,11 @@ rule merge_clust:
 # TAB FORMATTING
 rule tab_format:
 	input:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
 	output:
-		config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
+		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
 	log:
-		"../log/tab_format_{run}.log"
+		"../log/tab_format_"+files_prefix+".log"
 	shell:
 		"""
 		set +u; module load bioinfo/obitools-v1.2.11; set -u

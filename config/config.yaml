@@ -1,9 +1,13 @@
+tomerge:
+  FALSE
 resourcesfolder:
   ../resources/
 resultsfolder:
   ../results/
 fastqfiles:
   - wolf_diet
+#mergedfile:
+#  wolf_diet_merged
 split_fastq:
   nfiles: 2
 alifilt:
