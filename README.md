@@ -2,11 +2,13 @@
 
 [![DOI](https://zenodo.org/badge/494010774.svg)](https://zenodo.org/badge/latestdoi/494010774)
 
+
 ## About
 
 This is a snakemake workflow based on the obitools suite of programs, that analyzes DNA metabarcoding data.
 
 Sequence analysis is performed with the obitools (Boyer et al. 2016) and sumaclust (Mercier et al. 2013) through a Snakemake pipeline (Molder et al. 2021).
+
 
 ## Getting started
 
@@ -35,9 +37,10 @@ Download/copy your data in the `resources/` folder. Three files are required:
 - forward and reverse fastq files
 - the corresponding ngsfilter file
 
-They should be named as follows: `basename_R1.fastq`, `basename_R2.fastq`, `basename_ngsfilter.tab`
+They should be named as follows: `prefix_R1.fastq`, `prefix_R2.fastq`, `prefix_ngsfilter.tab`
 
-And be put in a subfolder whose name is the "basename" of the files (see _Example_).
+And be put in a subfolder whose name is the prefix of the files (see _Example_).
+
 
 ## Usage
 
@@ -108,19 +111,47 @@ cd workflow/
 sbatch sub_smk.sh
 ```
 
+### Option: merging libraries
+
+You may want to merge libraries, for example if technical replicates are splitted in different libraries. To allow this, the value of "tomerge" in the `config/config.yaml` file should be set to `TRUE`. Besides, the prefix of your library files should be listed in the `config/config.yaml` file, such as:
+
+```
+tomerge:
+  TRUE
+resourcesfolder:
+  ../resources/
+resultsfolder:
+  ../results/
+fastqfiles:
+  - myfirstlibfileprefix
+  - mysecondlibfileprefix
+mergedfile:
+  mymergedlibs
+```
+
+Two ngsfilter files will be necessary: `resources/myfirstlibfileprefix/myfirstlibfileprefix_ngsfilter.tab` and `resources/myfirstlibfileprefix/mysecondlibfileprefix_ngsfilter.tab`.
+
+:warning: If you want to be able to distinguish your technical replicates in the final output, don't forget to give your samples different names in the ngsfilter files, e.g. for a sample named "sample", you could change its name to "sample_a" in the first ngsfilter file and "sample_b" in the second ngsfilter file (if you have to technical replicates).
+
+The value of "mergedfile" corresponds to the prefix of the merged files from the dereplication to the end of the workflow.
+
+
 ## Going further
 
 You may want to clean up potential molecular artifacts: have a look at the R package [metabaR](https://github.com/metabaRfactory/metabaR)!
 
+
 ## Acknowledgements
 
 Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric Boyer](https://www.researchgate.net/profile/Frederic-Boyer-3)**, **[Céline Mercier](https://www.celine-mercier.info/)** and **Clément Lionnet** for their help with the obitools!
+
 
 ## How to cite this repository
 
 Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: First release (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.6676578
 
 :triangular_flag_on_post: Don't forget to cite this repository is you use if for your research :slightly_smiling_face:
+
 
 ## References
 
