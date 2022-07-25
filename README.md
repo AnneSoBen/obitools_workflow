@@ -120,7 +120,7 @@ Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric 
 
 Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: First release (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.6676578
 
-:triangular_flag_on_post: Don't forget to cite this repository is you use if for your research :)
+:triangular_flag_on_post: Don't forget to cite this repository is you use if for your research :slightly_smiling_face:
 
 ## References
 
