@@ -1,7 +1,5 @@
 # OBITools workflow
 
-[![DOI](https://zenodo.org/badge/494010774.svg)](https://zenodo.org/badge/latestdoi/494010774)
-
 
 ## About
 
@@ -148,7 +146,7 @@ Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric 
 
 ## How to cite this repository
 
-Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: v1.0.1. Zenodo. https://doi.org/10.5281/zenodo.6676578
+Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: v1.0.1. GitHub.
 
 :triangular_flag_on_post: Don't forget to cite this repository is you use if for your research :slightly_smiling_face:
 
