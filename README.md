@@ -99,6 +99,8 @@ tree
     └── sub_smk.sh
 ```
 
+Note that the name of the subfolder containing your source files (fastq and ngsfilter files) should be the prefix of the files.
+
 The config.yaml file is already modified to fit this data.
 
 ### Run the workflow
@@ -125,6 +127,20 @@ fastqfiles:
   - mysecondlibfileprefix
 mergedfile:
   mymergedlibs
+```
+
+The source files of each library should be in separate subfolders. For example:
+
+```
+└─ resources
+   └── myfirstlibprefix
+   |   ├── myfirstlibprefix_ngsfilter.tab
+   |   ├── myfirstlibprefix_R1.fastq
+   |   └── myfirstlibprefix_R2.fastq
+   └── mysecondlibprefix
+       ├── mysecondlibprefix_ngsfilter.tab
+       ├── mysecondlibprefix_R1.fastq
+       └── mysecondlibprefix_R2.fastq
 ```
 
 Two ngsfilter files will be necessary: `resources/myfirstlibfileprefix/myfirstlibfileprefix_ngsfilter.tab` and `resources/myfirstlibfileprefix/mysecondlibfileprefix_ngsfilter.tab`.
