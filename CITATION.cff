@@ -4,7 +4,8 @@ authors:
   - family-names: Benoiston
     given-names: Anne-Sophie
     orcid:  https://orcid.org/0000-0001-9446-5703 
-title: AnneSoBen/obitools_workflow: First release
-version: v1.0.0
-doi: 10.5281/zenodo.6676578
-date-released: 2022-06-21
+title: AnneSoBen/obitools_workflow
+publisher: GitHub
+year: 2022
+howpublished: https://github.com/AnneSoBen/obitools_workflow
+commit: 97fe3ade6023a6e591cb6cde8fa0871f103f835d
