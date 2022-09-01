@@ -1,6 +1,6 @@
 # OBITools workflow
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6977255.svg)](https://doi.org/10.5281/zenodo.6977255)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6676577.svg)](https://doi.org/10.5281/zenodo.6676577)
 
 
 ## About
@@ -11,10 +11,6 @@ Sequence analysis is performed with the obitools (Boyer et al. 2016) and sumaclu
 
 
 ## Getting started
-
-<!--- ### Prerequisites --->
-
-<!---  This workflow is meant to be executed on a computing cluster running with **SLURM**. It has been written to run on the Genotoul computing cluster (http://bioinfo.genotoul.fr/). --->
 
 ### Installation
 
@@ -201,12 +197,12 @@ You may want to clean up potential molecular artifacts: have a look at the R pac
 
 ## Acknowledgements
 
-Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric Boyer](https://www.researchgate.net/profile/Frederic-Boyer-3)**, **[Céline Mercier](https://www.celine-mercier.info/)** and **Clément Lionnet** for their help with the obitools!
+Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric Boyer](https://www.researchgate.net/profile/Frederic-Boyer-3)**, **[Céline Mercier](https://www.celine-mercier.info/)** and **Clément Lionnet** for their help with the obitools! Also thanks to the **[ECOFEED](https://cordis.europa.eu/project/id/817779/fr)** project for funding the development of the first version of this workflow.
 
 
 ## How to cite this repository
 
-Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: v1.0.1. GitHub. https://doi.org/10.5281/zenodo.6977255.
+Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: v1.0.2. GitHub. https://doi.org/10.5281/zenodo.6676577.
 
 :triangular_flag_on_post: Don't forget to cite this repository is you use if for your research :slightly_smiling_face:
 
