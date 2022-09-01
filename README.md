@@ -7,21 +7,34 @@
 
 This is a snakemake workflow based on the obitools suite of programs, that analyzes DNA metabarcoding data.
 
-Sequence analysis is performed with the obitools (Boyer et al. 2016) and sumaclust (Mercier et al. 2013) through a Snakemake pipeline (Molder et al. 2021).
+Sequence analysis is performed with the obitools (Boyer et al. 2016) and sumaclust (Mercier et al. 2013) through a Snakemake pipeline (Mölder et al. 2021).
 
 
 ## Getting started
 
-### Prerequisites
+[comment]: # ### Prerequisites
 
-This workflow is meant to be executed on a computing cluster running with **SLURM**. It has been written to run on the Genotoul computing cluster (http://bioinfo.genotoul.fr/).
+[comment]: # This workflow is meant to be executed on a computing cluster running with **SLURM**. It has been written to run on the Genotoul computing cluster (http://bioinfo.genotoul.fr/).
 
 ### Installation
+
+#### Dependencies
+
+In order to run the workflow, you must have installed the following programs:
+
+- [python3](https://www.python.org/downloads/)
+- [conda](https://docs.conda.io/en/latest/miniconda.html)
+- [snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+
+Please note that the workflow is currently running exclusively on Unix systems.
+
+#### Install the workflow
 
 Clone the repository:
 ```sh
 git clone https://github.com/AnneSoBen/obitools_workflow.git
 ```
+
 ### Directories and files structure
 
 The repository contains five folders:
@@ -46,12 +59,19 @@ And be put in a subfolder whose name is the prefix of the files (see _Example_).
 
 Before running the workflow, the two configuration files have to be modified: `workflow/cluster.yaml` that sets up the ressources available for each rule, and `config/config.yaml` where you can edit the values of the parameters used by the rules and the basename of your files.
 
-Then, to run the workflow in a single command on the cluster:
-
+Then, run the workflow:
 ```sh
 cd workflow
-sbatch sub_smk.sh
+conda activate snakemake
+snakemake -c1 --use-conda
 ```
+
+[comment]: # Then, to run the workflow in a single command on the cluster:
+
+[comment]: # ```sh
+[comment]: # cd workflow
+[comment]: # sbatch sub_smk.sh
+[comment]: # ```
 
 ## Example
 
@@ -107,10 +127,11 @@ The config.yaml file is already modified to fit this data.
 
 ### Run the workflow
 
-Now run the workflow on the cluster:
+Now run the workflow:
 ```sh
 cd workflow/
-sbatch sub_smk.sh
+conda activate snakemake
+snakemake -c1 --use-conda
 ```
 
 ### Option: merging libraries

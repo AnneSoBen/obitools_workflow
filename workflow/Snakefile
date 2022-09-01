@@ -42,9 +42,10 @@ checkpoint split_fastq:
 		nfiles=config["split_fastq"]["nfiles"],
 		R1=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1",
 		R2=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R2"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		mkdir {params.folder}
 		obidistribute -n {params.nfiles} -p {params.R1} {input.R1}
 		obidistribute -n {params.nfiles} -p {params.R2} {input.R2}
@@ -58,9 +59,10 @@ rule pairing:
 		R2=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R2_{n}.fastq"
 	output:
 		temp(config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1R2_{n}.fastq")
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		illuminapairedend -r {input.R2} {input.R1} > {output}
 		"""
 
@@ -69,10 +71,10 @@ rule pairing:
 def aggregate_R1R2(wildcards):
 	checkpoint_output=checkpoints.split_fastq.get(**wildcards).output[0]
 	file_names=temp(expand(config["resultsfolder"]+"{{run}}/splitted_fastq/{{run}}_R1R2_{n}.fastq", n=glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n))
-	print('in_def_aggregate_R1R2')
-	print(checkpoint_output)
-	print(glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
-  	print(file_names)
+	# print('in_def_aggregate_R1R2')
+	# print(checkpoint_output)
+	# print(glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
+	# print(file_names)
 	return file_names
 	
 
@@ -98,14 +100,15 @@ rule alifilt:
 	output:
 		good=config["resultsfolder"]+"{run}/{run}_R1R2_good.fastq",
 		bad=config["resultsfolder"]+"{run}/{run}_R1R2_bad.fastq"
-	log:
-		"../log/split_ali_{run}.log"
 	params:
 		minscore=config["alifilt"]["minscore"],
 		prefix=config["resultsfolder"]+"{run}/{run}_R1R2_"
+	log:
+		"../log/split_ali_{run}.log"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		obiannotate -S ali:'"good" if score>{params.minscore} else "bad"' {input} | obisplit -t ali -p {params.prefix} 2> {log}
 		"""
 
@@ -121,9 +124,10 @@ rule demultiplex:
 		ngs=config["resourcesfolder"]+"{run}/{run}_ngsfilter.tab"
 	log:
 		"../log/demultiplex_{run}.log"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		obiannotate --without-progress-bar --sanger -S 'Avgqphred:-int(math.log10(sum(sequence.quality)/len(sequence))*10)' {input} | ngsfilter --fasta-output -t {params.ngs} -u {output.unassigned} > {output.demultiplexed} 2> {log}
 		"""
 
@@ -163,9 +167,10 @@ checkpoint split_fasta:
 		folder=folder_prefix+"derepl_tmp",
 		nfiles=config["split_fasta"]["nfiles"],
 		tmp=folder_prefix+"derepl_tmp/tmp"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		mkdir {params.folder}
 		obiannotate -S start:"hash(str(sequence))%{params.nfiles}" {input} | obisplit -t start -p {params.tmp}
 		"""
@@ -177,9 +182,10 @@ rule derepl:
 		folder_prefix+"derepl_tmp/tmp{t}.fasta"
 	output:
 		folder_prefix+"uniq/tmp_uniq{t}.fasta"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		obiuniq -m sample {input} > {output}
 		"""
 
@@ -188,10 +194,10 @@ rule derepl:
 def aggregate_derepl(wildcards):
         checkpoint_output=checkpoints.split_fasta.get(**wildcards).output[0]
         file_names=expand(folder_prefix2+"uniq/tmp_uniq{t}.fasta", t=glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
-        print('in_def_aggregate_derepl')
-	print(checkpoint_output)
-	print(glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
-        print(file_names)
+	# print('in_def_aggregate_derepl')
+	# print(checkpoint_output)
+	# print(glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
+	# print(file_names)
         return file_names
 
 
@@ -219,14 +225,15 @@ rule basicfilt:
 		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl.fasta"
 	output:
 		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
-	log:
-		"../log/basicfilt_"+files_prefix+".log"
 	params:
 		minlength=config["basicfilt"]["minlength"],
 		mincount=config["basicfilt"]["mincount"]
+	log:
+		"../log/basicfilt_"+files_prefix+".log"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		obiannotate --length -S 'GC_content:len(str(sequence).replace("a","").replace("t",""))*100/len(sequence)' {input} | obigrep -l {params.minlength} -s '^[acgt]+$' -p 'count>{params.mincount}' > {output} 2> {log}
 		"""
 
@@ -237,14 +244,15 @@ rule clustering:
 		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt.fasta"
 	output:
 		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl.fasta"
-	log:
-		"../log/clustering_"+files_prefix+".log"
 	params:
 		minsim=config["clustering"]["minsim"]
+	log:
+		"../log/clustering_"+files_prefix+".log"
 	threads: 8
+	conda:
+		"envs/suma_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/sumaclust_v1.0.31; set -u
 		sumaclust -t {params.minsim} -p {threads} {input} > {output}
 		"""
 
@@ -257,9 +265,10 @@ rule merge_clust:
 		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
 	log:
 		"../log/merge_clust_"+files_prefix+".log"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		obiselect -c cluster -n 1 --merge sample -M -f count {input} > {output} 2> {log}
 		"""
 
@@ -272,8 +281,9 @@ rule tab_format:
 		folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
 	log:
 		"../log/tab_format_"+files_prefix+".log"
+	conda:
+		"envs/obi_env.yaml"
 	shell:
 		"""
-		set +u; module load bioinfo/obitools-v1.2.11; set -u
 		obitab -n NA -d -o {input} > {output} 2> {log}
 		"""
