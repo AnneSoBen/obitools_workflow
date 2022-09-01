@@ -14,13 +14,10 @@ configfile: "../config/config.yaml"
 
 # GET FINAL OUTPUT(S)
 def get_input_all():
-	print(config["tomerge"])
 	if config["tomerge"]:
 		inputfiles=config["resultsfolder"]+config["mergedfile"]+"/"+config["mergedfile"]+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
 	else:
 		inputfiles=expand("{folder}{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab", run=config["fastqfiles"], folder=config["resultsfolder"])
-	print("Expected output(s):")
-	print(inputfiles)
 	return inputfiles
 
 
