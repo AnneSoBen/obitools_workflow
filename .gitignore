@@ -1,4 +1,5 @@
 # files and folder to ignore:
+.snakemake
 workflow/.snakemake
 workflow/.snakemake/*
 workflow/*.err

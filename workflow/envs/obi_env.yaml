@@ -1,0 +1,7 @@
+name: obitools
+channels:
+  - conda-forge
+  - bioconda  
+dependencies:
+  - obitools
+
