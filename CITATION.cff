@@ -1,4 +1,4 @@
-cff-version: 1.1.0
+cff-version: 1.0.2
 message: "If you use this software, please cite it as below."
 authors:
   - family-names: Benoiston
@@ -8,4 +8,4 @@ title: AnneSoBen/obitools_workflow
 publisher: GitHub
 year: 2022
 howpublished: https://github.com/AnneSoBen/obitools_workflow
-commit: 97fe3ade6023a6e591cb6cde8fa0871f103f835d
+commit: 82f5ec5bbd8b3e58d6fd0fd5212bcf1a561ce3cf
