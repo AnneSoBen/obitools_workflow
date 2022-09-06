@@ -257,7 +257,7 @@ Thanks to **[Lucie Zinger](https://luciezinger.wordpress.com/)**, **[Frédéric 
 
 Anne-Sophie Benoiston. (2022). AnneSoBen/obitools_workflow: v1.0.2. GitHub. https://doi.org/10.5281/zenodo.6676577.
 
-:triangular_flag_on_post: Don't forget to cite this repository is you use if for your research :slightly_smiling_face:
+:triangular_flag_on_post: Don't forget to cite this repository if you use it for your research :slightly_smiling_face:
 
 
 ## References
