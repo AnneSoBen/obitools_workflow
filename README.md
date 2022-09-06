@@ -2,6 +2,59 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6676577.svg)](https://doi.org/10.5281/zenodo.6676577)
 
+<!-- TABLE OF CONTENTS -->
+<details>
+    <summary>Table of Contents</summary>
+    <ol>
+        <li>
+            <a href="#about">About</a>
+        </li>
+        <li>
+            <a href="#getting-started">Getting Started</a>
+            <ul>
+                <li><a href="#installation">Installation</a></li>
+            </ul>
+            <ul>
+                <li><a href="#directories-and-files-structure">Directories and files structure</a></li>
+            </ul>
+            <ul>
+                <li><a href="#download-your-data">Download your data</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#usage">Usage</a>
+            <ul>
+                <li><a href="#configuration">Configuration</a></li>
+            </ul>
+            <ul>
+                <li><a href="#run-the-workflow">Run the workflow</a></li>
+        </li>
+        <li>
+            <a href="#example">Example</a>
+            <ul>
+                <li><a href="#download-toy-data">Download toy data</a></li>
+            </ul>
+            <ul>
+                <li><a href="#run-the-workflow">Run the workflow</a></li>
+            </ul>
+            <ul>
+                <li><a href="#option-merging-libraries">Option: merging libraries</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#going-further">Going further</a>
+        </li>
+        <li>
+            <a href="#acknowledgements">Acknowledgements</a>
+        </li>
+        <li>
+            <a href="#how-to-cite-this-repository">How to cite this repository</a>
+        </li>
+        <li>
+            <a href="#references">References</a>
+        </li>
+    </ol>
+</details>
 
 ## About
 
