@@ -2,4 +2,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - sumaclust =1.0.31
+  - fastqc =0.11.9

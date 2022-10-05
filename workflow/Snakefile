@@ -9,22 +9,33 @@ This is a snakemake workflow that analyzes DNA metabarcoding data with the OBITo
 """
 
 configfile: "../config/config.yaml"
-
+report: "report/workflow.rst"
 
 
 # GET FINAL OUTPUT(S)
 def get_input_all():
 	if config["tomerge"]:
-		inputfiles=config["resultsfolder"]+config["mergedfile"]+"/"+config["mergedfile"]+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
+		obioutput=config["resultsfolder"]+config["mergedfile"]+"/"+config["mergedfile"]+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab"
+		clust_seq="report/docs/"+config["mergedfile"]+"_clust_seq_length.png"
 	else:
-		inputfiles=expand("{folder}{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab", run=config["fastqfiles"], folder=config["resultsfolder"])
-	return inputfiles
+		obioutput=expand("{folder}{run}/{run}_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.tab", run=config["fastqfiles"], folder=config["resultsfolder"])
+		clust_seq=expand("report/docs/{run}_clust_seq_length.png", run=config["fastqfiles"])
 
+	inputfiles=[obioutput,clust_seq]
+
+	return inputfiles
 
 
 rule all:
 	input:
-		get_input_all()
+		get_input_all(),
+		expand("report/docs/{run}_R1_fastqc/fastqc_report.html", run=config["fastqfiles"]),
+		expand("report/docs/{run}_R2_fastqc/fastqc_report.html", run=config["fastqfiles"]),
+		expand("report/docs/{run}_first_steps_seq_length.png", run=config["fastqfiles"]),
+		expand("report/docs/{run}_count_seq1.tsv", run=config["fastqfiles"]),
+		expand("report/docs/{run}_count_seq1.svg", run=config["fastqfiles"]),
+		expand("report/docs/{run}_count_seq2.tsv", run=config["fastqfiles"]),
+		expand("report/docs/{run}_count_seq2.svg", run=config["fastqfiles"])
 
 
 # SPLIT FASTQ
@@ -55,7 +66,7 @@ rule pairing:
 		R1=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1_{n}.fastq",
 		R2=config["resultsfolder"]+"{run}/splitted_fastq/{run}_R2_{n}.fastq"
 	output:
-		temp(config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1R2_{n}.fastq")
+		config["resultsfolder"]+"{run}/splitted_fastq/{run}_R1R2_{n}.fastq"
 	conda:
 		"envs/obi_env.yaml"
 	shell:
@@ -67,11 +78,7 @@ rule pairing:
 # AGGREGATE
 def aggregate_R1R2(wildcards):
 	checkpoint_output=checkpoints.split_fastq.get(**wildcards).output[0]
-	file_names=temp(expand(config["resultsfolder"]+"{{run}}/splitted_fastq/{{run}}_R1R2_{n}.fastq", n=glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n))
-	# print('in_def_aggregate_R1R2')
-	# print(checkpoint_output)
-	# print(glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
-	# print(file_names)
+	file_names=expand(config["resultsfolder"]+"{{run}}/splitted_fastq/{{run}}_R1R2_{n}.fastq", n=glob_wildcards(os.path.join(checkpoint_output, "{run}_R1_{n}.fastq")).n)
 	return file_names
 	
 
@@ -86,7 +93,7 @@ rule merge_paired:
 	shell:
 		"""
 		cat {input} > {output}
-		rm -r {params.splittedfastq}
+		# rm -r {params.splittedfastq}
 		"""
 
 
@@ -191,10 +198,6 @@ rule derepl:
 def aggregate_derepl(wildcards):
         checkpoint_output=checkpoints.split_fasta.get(**wildcards).output[0]
         file_names=expand(folder_prefix2+"uniq/tmp_uniq{t}.fasta", t=glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
-	# print('in_def_aggregate_derepl')
-	# print(checkpoint_output)
-	# print(glob_wildcards(os.path.join(checkpoint_output, "tmp{t}.fasta")).t)
-	# print(file_names)
         return file_names
 
 
@@ -212,7 +215,7 @@ rule merge_derepl:
 	shell:
 		"""
 		cat {input} > {output} 2> {log}
-		rm -r {params.derepl} {params.uniq}
+		# rm -r {params.derepl} {params.uniq}
 		"""
 
 
@@ -284,3 +287,70 @@ rule tab_format:
 		"""
 		obitab -n NA -d -o {input} > {output} 2> {log}
 		"""
+
+# REPORT RULES
+
+# PLOT DISTRIBUTION OF READS QUALITY
+rule fastqc:
+	input:
+		R1=config["resourcesfolder"]+"{run}/{run}_R1.fastq",
+		R2=config["resourcesfolder"]+"{run}/{run}_R2.fastq"
+	output:
+		R1=report("report/docs/{run}_R1_fastqc/fastqc_report.html", caption="report/plot_fastqc.rst", category="Quality"),
+		R2=report("report/docs/{run}_R2_fastqc/fastqc_report.html", caption="report/plot_fastqc.rst", category="Quality")
+	conda:
+		"envs/fastqc.yaml"
+	shell:
+		"""
+		fastqc {input.R1} --extract -o report/docs/
+		fastqc {input.R2} --extract -o report/docs/
+		"""
+
+# PLOT SEQUENCES LENGTH
+rule plot_seq_length1:
+	input:
+		ps=config["resultsfolder"]+"{run}/{run}_R1R2.fastq",
+		afs=config["resultsfolder"]+"{run}/{run}_R1R2_good.fastq",
+		ds=config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed.fasta"
+	output:
+		sl=report("report/docs/{run}_first_steps_seq_length.png", caption="report/plot_first_steps_seq_length.rst", category="Sequence length")
+	conda:
+		"envs/stats.yaml"
+	script:
+		"scripts/plot_seq_length.py"
+
+
+# PLOT SEQUENCES LENGTH
+rule plot_seq_length2:
+	input:
+		cs=folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
+	output:
+		csl=report("report/docs/"+files_prefix+"_clust_seq_length.png", caption="report/plot_clust_seq_length.rst", category="Sequence length")
+	conda:
+		"envs/stats.yaml"
+	script:
+		"scripts/plot_seq_length2.py"
+
+
+# COUNT SEQUENCES
+rule count_seq:
+	input:
+		R1=config["resourcesfolder"]+"{run}/{run}_R1.fastq",
+		R2=config["resourcesfolder"]+"{run}/{run}_R2.fastq",
+		R1R2=config["resultsfolder"]+"{run}/{run}_R1R2.fastq",
+		good=config["resultsfolder"]+"{run}/{run}_R1R2_good.fastq",
+		bad=config["resultsfolder"]+"{run}/{run}_R1R2_bad.fastq",
+		demult=config["resultsfolder"]+"{run}/{run}_R1R2_good_demultiplexed.fasta",
+		unass=config["resultsfolder"]+"{run}/{run}_R1R2_good_unassigned.fasta",
+		derepl=folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl.fasta",
+		filt=folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt.fasta",
+		clust=folder_prefix+files_prefix+"_R1R2_good_demultiplexed_derepl_basicfilt_cl_agg.fasta"
+	output:
+		tab1=report("report/docs/{run}_count_seq1.tsv", category="Counts"),
+		svg1=report("report/docs/{run}_count_seq1.svg", category="Counts"),
+		tab2=report("report/docs/{run}_count_seq2.tsv", category="Counts"),
+		svg2=report("report/docs/{run}_count_seq2.svg", category="Counts")
+	conda:
+		"envs/stats.yaml"
+	script:
+		"scripts/count_seq.py"

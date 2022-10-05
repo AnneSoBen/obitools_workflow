@@ -1,9 +1,15 @@
 # files and folder to ignore:
+.DS_Store
 .snakemake
 workflow/.snakemake
 workflow/.snakemake/*
+workflow/.DS_Store
+workflow/report.html
+workflow/report/.DS_Store
+workflow/report/docs/
+workflow/scripts/.DS_Store
 workflow/*.err
 workflow/*.out
-log/*.log
+log/*
 resources/*
 results/*
