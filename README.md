@@ -58,7 +58,7 @@
 
 ## About
 
-This is a snakemake workflow based on the obitools suite of programs, that analyzes DNA metabarcoding data.
+This is a Snakemake workflow based on the obitools suite of programs, that analyzes DNA metabarcoding data.
 
 Sequence analysis is performed with the obitools (Boyer et al. 2016) and sumaclust (Mercier et al. 2013) through a Snakemake pipeline (Mölder et al. 2021).
 
@@ -69,7 +69,7 @@ Sequence analysis is performed with the obitools (Boyer et al. 2016) and sumaclu
 
 #### Dependencies
 
-In order to run the workflow, you must have installed the following programs:
+In order to run the workflow, the following languages/programs are required:
 
 - [python3](https://www.python.org/downloads/)
 - [conda](https://docs.conda.io/en/latest/miniconda.html)
@@ -91,7 +91,7 @@ The repository contains five folders:
 - `log/`: where log files of each rule are written.
 - `resources/`: where you should download/copy your raw data (cf. _Download your data_)
 - `results/`: where all output files are written.
-- `workflow/`: contains the Snakemake workflow (`Snakefile`), the configuration file of the submission parameters on the cluster (`cluster.yaml`), the script to submit the workflow on the cluster (`sub_smk.sh`). 
+- `workflow/`: contains the Snakemake workflow (`Snakefile`), the configuration file of the submission parameters on the cluster (`cluster.yaml`) and the script to submit the workflow on the cluster (`sub_smk.sh`). 
 
 ### Download your data
 
@@ -112,7 +112,7 @@ Before running the workflow, the configuration file (`config/config.yaml`) has t
 
 | parameter          | description                                                                          | concerned rule(s)                                                                                    | default value | comment                                                                                                                                                              |
 |--------------------|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| tomerge            | whether to merge libraries before dereplication                                      | merge_demultiplex                                                                                    | FALSE         | should be set to 'TRUE' if you analyse several libraries and that you want to merge them                                                                             |
+| tomerge            | whether to merge libraries before dereplication                                      | merge_demultiplex                                                                                    | FALSE         | should be set to 'TRUE' if you analyse several libraries that you want to merge                                                                             |
 | resourcesfolder    | relative path to the folder containing resource files (fastq files and ngsfilter)    | split_fastq, demultiplex                                                                             | ../resources  | should not be changed, unless you want to rename the folder                                                                                                          |
 | resultsfolder      | relative path to the folder where output files will be written                       | all                                                                                                  | ../results    | should not be changed, unless you want to rename the folder                                                                                                          |
 | fastqfiles         | prefix of the name of the resource fastq files and ngsfilter                         | all                                                                                                  | wolf_diet     | must be changed to match your files name prefix                                                                                                                      |
@@ -136,7 +136,7 @@ conda activate snakemake
 snakemake -c1 --use-conda
 ```
 
-Alternatively, you can run the workflow in a single command on a SLURM cluster by submitting the `sub_smk.sh` file:
+Alternatively, you can run the workflow with a single command on a SLURM cluster by submitting the `sub_smk.sh` file:
 ```sh
 cd workflow
 sbatch sub_smk.sh
@@ -147,7 +147,7 @@ sbatch sub_smk.sh
 
 ### Download toy data
 
-If you want to test the workflow, download toy data from the obitools tutorial (https://pythonhosted.org/OBITools/wolves.html) in the `resources/` folder:
+If you want to test the workflow, download the toy dataset from the obitools tutorial (https://pythonhosted.org/OBITools/wolves.html) in the `resources/` folder:
 ```sh
 wget -O resources/wolf_tutorial.zip https://pythonhosted.org/OBITools/_downloads/wolf_tutorial.zip
 unzip resources/wolf_tutorial.zip -d resources/
@@ -160,7 +160,7 @@ ln -s wolf_F.fastq resources/wolf_diet/wolf_diet_R1.fastq
 ln -s wolf_R.fastq resources/wolf_diet/wolf_diet_R2.fastq
 ln -s wolf_diet_ngsfilter.txt resources/wolf_diet/wolf_diet_ngsfilter.tab
 ```
-You should get this directories and files structure:
+You should get this directory and file structure:
 ```sh
 tree
 ```
@@ -206,7 +206,7 @@ snakemake -c1 --use-conda
 
 ### Option: merging libraries
 
-You may want to merge libraries, for example if technical replicates are splitted in different libraries. To allow this, the value of "tomerge" in the `config/config.yaml` file should be set to `TRUE`. Besides, the prefix of your library files should be listed in the `config/config.yaml` file, such as:
+You may want to merge libraries, for example if technical replicates are split in different libraries. To allow this, the value of "tomerge" in the `config/config.yaml` file should be set to `TRUE`. The prefix of your library files should be listed in the `config/config.yaml` file, such as:
 
 ```
 tomerge:
@@ -238,7 +238,7 @@ The source files of each library should be in separate subfolders. For example:
 
 Two ngsfilter files will be necessary: `resources/myfirstlibfileprefix/myfirstlibfileprefix_ngsfilter.tab` and `resources/myfirstlibfileprefix/mysecondlibfileprefix_ngsfilter.tab`.
 
-:warning: If you want to be able to distinguish your technical replicates in the final output, don't forget to give your samples different names in the ngsfilter files, e.g. for a sample named "sample", you could change its name to "sample_a" in the first ngsfilter file and "sample_b" in the second ngsfilter file (if you have to technical replicates).
+:warning: If you want to be able to distinguish your technical replicates in the final output, don't forget to give your samples different names in the ngsfilter files, e.g. for a sample named "sample", you could change its name to "sample_a" in the first ngsfilter file and "sample_b" in the second ngsfilter file (if you have two technical replicates).
 
 The value of "mergedfile" corresponds to the prefix of the merged files from the dereplication to the end of the workflow.
 
