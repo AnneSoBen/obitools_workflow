@@ -156,9 +156,10 @@ rm resources/wolf_tutorial.zip
 ```
 Rename the files to fit the template decribed above (or create symbolic links):
 ```sh
-ln -s wolf_F.fastq resources/wolf_diet/wolf_diet_R1.fastq
-ln -s wolf_R.fastq resources/wolf_diet/wolf_diet_R2.fastq
-ln -s wolf_diet_ngsfilter.txt resources/wolf_diet/wolf_diet_ngsfilter.tab
+cd resources/wolf_tutorial
+ln -s wolf_F.fastq wolf_diet_R1.fastq
+ln -s wolf_R.fastq wolf_diet_R2.fastq
+ln -s wolf_diet_ngsfilter.txt wolf_diet_ngsfilter.tab
 ```
 You should get this directory and file structure:
 ```sh
@@ -199,7 +200,7 @@ The config.yaml file is already modified to fit this data.
 
 Now run the workflow:
 ```sh
-cd workflow/
+cd ../../workflow/
 conda activate snakemake
 snakemake -c1 --use-conda
 ```
