@@ -156,7 +156,7 @@ rm resources/wolf_tutorial.zip
 ```
 Rename the files to fit the template decribed above (or create symbolic links):
 ```sh
-cd resources/wolf_tutorial
+cd resources/wolf_diet
 ln -s wolf_F.fastq wolf_diet_R1.fastq
 ln -s wolf_R.fastq wolf_diet_R2.fastq
 ln -s wolf_diet_ngsfilter.txt wolf_diet_ngsfilter.tab
